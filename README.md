@@ -1,32 +1,65 @@
 # Checkpoint compaction for Claude Code (worked example)
 
-A Claude Code plugin with which a session can compact its own conversation at a moment it chooses. Before the plugin
-compacts, the session must leave a resume file that a checker accepts. The moment is the model's own judgement, and the
-plugin cannot tell a clean point from any other: preferably it is a clean checkpoint in the work, when a step is
-finished and nothing is in flight. There the session writes the file and calls the plugin's `checkpoint_compact` tool
-with the file's path and SHA-256. The checker accepts it only if the path is absolute and leads to a Markdown file
+A Claude Code plugin that lets a session compact its own conversation at a point it chooses, after it has written down
+where it stands.
+
+When a long session reaches a clean point in its work, a step finished and nothing in flight, it writes a resume file:
+what it was doing, what is done and what comes next. It then calls the plugin's tool, `checkpoint_compact`, with the
+file's path and SHA-256. The plugin's checker accepts the file only if the path is absolute and leads to a Markdown file
 inside the records folder, the SHA-256 matches, the file was last changed within the past hour, and the session's own id
-is in its first 10 lines. When the session's turn ends and no other turn of the main loop is under way, the checker runs
-again: the compaction follows if it accepts the file, and the request is refused if it does not. While another turn is
-under way, the request waits (see "How it works"). Afterwards a note in the conversation names the file to read back,
-and a queued prompt asks the session to read it.
+is in its first 10 lines. When the session's turn ends, the checker runs again on the same file. If it still accepts it,
+the plugin asks Claude Code to compact the conversation; if not, the request is refused. Afterwards a note in the
+conversation names the file, and a queued prompt asks the session to read it before it goes on. The moment is the
+model's own judgement: the plugin cannot tell a clean point from any other.
 
 The plugin does not switch off or delay Claude Code's own automatic compaction. If the conversation reaches Claude
 Code's compaction threshold before the session has called the tool, Claude Code compacts it in the usual way, with no
 resume file. A session therefore compacts at a moment it chose only when it reaches its checkpoint first, and that
-depends on how it is told to checkpoint and on Claude Code's compaction settings. In the measurement below, the
+depends on how it is told to checkpoint and on Claude Code's compaction settings. In the paired test below, the
 plugin's runs had Claude Code's compaction window raised to 700,000 tokens with `CLAUDE_CODE_AUTO_COMPACT_WINDOW`, so
 that automatic compaction would not come first.
 
 It is shared as a worked example of one workstation's practice, not as a general product. Read the code and adapt it
 to your own workflow before relying on it.
 
-## The measurement so far
+## Why this workstation uses it
 
-A tie to know first: Claude sessions built this plugin and ran this measurement, and Anthropic makes both Claude Code
-and the Claude models those sessions ran on. The measured runs used Claude Opus 5.5.
+A tie to know first: Claude sessions built this plugin, ran the paired test below and wrote this page, and Anthropic
+makes both Claude Code and the Claude models those sessions ran on.
 
-One small measurement so far, and it is exploratory. Three pairs of runs started from one saved session state of about 400,000 tokens, on Claude Opus 5.5, with one compaction in each run: one run of each pair used this plugin with its pointer, its reminder and its resume turn, the other Claude Code's normal automatic compaction. Afterwards, the plugin's runs answered 18, 20 and 19 of 20 questions about the earlier work correctly, and the automatic runs 19, 19 and 19. The plugin's runs took longer (21.5 to 26.1 minutes, against 14.4 to 18.8) and their recorded requests cost more at list prices, $2.61 to $6.34 more a pair, without the compaction calls, which the session files do not hold; part of the difference may come from caching, an inference the measurement did not test. Only runs in which the session reached its checkpoint would have counted, and repeated compactions in one session were not tested. The measurement does not show that the plugin keeps more of a session than automatic compaction does.
+On the workstation this comes from, several Claude Code sessions run long pieces of work side by side, and each keeps
+its state in shared records that the other sessions and the person running them can read. The plugin was built so that
+a session could compact at a clean point, with its state saved to those records first, without anyone typing
+`/compact` in each window.
+
+What it gives is the timing and the file, not a better summary. A session compacts after a step is finished rather than
+in the middle of one, and the resume file it leaves is checked, kept and can be read by anyone, so the work can be taken
+up from it, by the same session or another. The paired test below found no difference in what a session remembered
+afterwards; the plugin is kept for these two reasons.
+
+It is in daily use there. Counted on 12 November 2026 in 48 session files of the workstation's main project folder:
+711 calls of the tool, 664 of them accepted. The closing step, from the call to the compaction, cost 0.34 dollars at
+list prices at the median, and all closing steps together 1.52 per cent of those sessions' use at list. One model had
+no row of its own in the price table, and its requests were priced at the table's highest Claude row.
+
+## The paired test
+
+One small test, reported on 12 November 2026, and it is exploratory. The measured runs used Claude Opus 5.5. Every run
+started from one saved session state of about 400,000 tokens, built from the workstation's own records, and after one
+compaction answered 20 questions about the earlier work.
+
+- **Two probes came first.** With nothing compacted, a run answered 20 of 20 right; after one normal automatic
+  compaction, 17 of 20. The planned, larger test needed these two at least 4 apart to have room to show a gain, so it
+  stopped there, and the three pairs below were run as a smaller follow-up.
+- **Three pairs.** In each, one run used this plugin with its pointer, its reminder and its resume turn, and the other
+  Claude Code's normal automatic compaction. The plugin's runs answered 18, 20 and 19 of 20 right, and the automatic
+  runs 19, 19 and 19. No run gave a stale or a wrong answer; the rest were left unanswered.
+- **Time and cost.** The plugin's runs took longer (21.5 to 26.1 minutes, against 14.4 to 18.8) and their recorded
+  requests cost more at list prices, $2.61 to $6.34 more a pair, without the compaction calls, which the session files
+  do not hold; part of the difference may come from caching, an inference the test did not check.
+
+Only runs in which the session reached its checkpoint would have counted, and repeated compactions in one session were
+not tested. The test does not show that the plugin keeps more of a session than automatic compaction does.
 
 ## Requirements
 
@@ -151,13 +184,13 @@ Two scripts in `plugins/checkpoint-compact/checker/` can run as ordinary Claude 
 - In a headless session it has not compacted where that was tried (see the known behaviours below).
 - It checks a resume file's place, size, digest, age and opening lines, not whether what the file says is right or
   enough.
-- It does not show that a compaction keeps more of the session; see the measurement above.
+- It does not show that a compaction keeps more of the session; see the paired test above.
 - It keeps nothing between sessions and calls no network service. The checker writes nothing; the optional reminder
   writes one small state file per session.
 - It assumes the records folder is not renamed or replaced while sessions run. The pointer checks the files it names
   through the folder it opened, not through the path it prints, so a folder put in the records folder's place during a
   read could make the printed path lead to a different file from the one whose SHA-256 it gives. An independent
-  re-check found this, and it was accepted as a written limit (see the review status below).
+  re-check found this, and it was accepted as a written limit.
 
 ## Known behaviours
 
@@ -191,7 +224,7 @@ a FIFO. They do not show how the plugin behaves in a live session.
 
 Written with AI assistance under the author's direction. Anthropic's Claude Opus 5.5, in Claude Code sessions, wrote
 the plugin, the checker and their tests, and made this package. OpenAI Codex wrote the first version of the optional
-reminder and its tests. Claude sessions set up and ran the measurement above: Claude Opus 5.5 sessions built its tools
+reminder and its tests. Claude sessions set up and ran the paired test above: Claude Opus 5.5 sessions built its tools
 and made the measured runs, and a Claude Fable 5.2 session drew their order and launched them. A model cannot
 independently accept its own work.
 
