@@ -1,0 +1,4 @@
+{
+  "description": "checkpoint-compact hooks module",
+  "modules": ["./register.js"]
+}

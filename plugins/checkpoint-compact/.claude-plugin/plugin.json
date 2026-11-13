@@ -1,0 +1,8 @@
+{
+  "name": "checkpoint-compact",
+  "version": "0.2.0",
+  "description": "Lets a Claude Code session compact at a checkpoint it chose, after checkpoint.py has accepted the resume file it wrote to its records folder. Claude Code's automatic compaction is left as it is.",
+  "author": {
+    "name": "NMAI Research"
+  }
+}
