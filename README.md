@@ -222,11 +222,11 @@ a FIFO. They do not show how the plugin behaves in a live session.
 
 ## Review status and AI assistance
 
-Written with AI assistance under the author's direction. Anthropic's Claude Opus 5.5, in Claude Code sessions, wrote
-the plugin, the checker and their tests, and made this package. OpenAI Codex wrote the first version of the optional
-reminder and its tests. Claude sessions set up and ran the paired test above: Claude Opus 5.5 sessions built its tools
-and made the measured runs, and a Claude Fable 5.2 session drew their order and launched them. A model cannot
-independently accept its own work.
+**AI disclosure.** Written with AI assistance under the author's direction. Anthropic's Claude Opus 5.5, in Claude Code
+sessions, wrote the plugin, the checker and their tests, and made this package. OpenAI Codex wrote the first version of
+the optional reminder and its tests. Claude sessions set up and ran the paired test above: Claude Opus 5.5 sessions
+built its tools and made the measured runs, and a Claude Fable 5.2 session drew their order and launched them. A model
+cannot independently accept its own work. Models are not authors.
 
 Reviewed across its versions by OpenAI's GPT-6 Astra and GPT-6.1 Sol, whose lab also wrote the reminder's first version,
 and by Google's Gemini 4 Argon. Still open: what "What it does not do" lists, two narrow test gaps and one error
