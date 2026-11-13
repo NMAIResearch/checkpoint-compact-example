@@ -195,18 +195,10 @@ reminder and its tests. Claude sessions set up and ran the measurement above: Cl
 and made the measured runs, and a Claude Fable 5.2 session drew their order and launched them. A model cannot
 independently accept its own work.
 
-Version 0.1.0 of the plugin and the checker were reviewed on 16 October 2026, before they were first installed, by
-OpenAI's GPT-6 Astra, and re-checked twice by OpenAI's GPT-6.1 Sol. The second re-check left one minor limit, given
-under "What it does not do". The reminder was not part of that review. This package, which generalises version 0.1.3 of
-the plugin, was then read on 12 November 2026 by OpenAI's GPT-6.1 Sol, from the same lab that wrote the reminder's first
-version and reviewed version 0.1.0. That read found no blocking fault, one major issue and five minor ones. This form
-leaves the major one unfixed and states it under "What it does not do"; it narrows the wording the read found too broad
-and adds what it found missing: tests, and the records folder's permissions at install. The changes made after that read
-were read twice on 13 November 2026 by Google's Gemini 4 Argon, the second time reading the mends of its own first
-findings. Its seven findings, one of medium consequence and six low, were of wording that did not match the code and of
-gaps in the tests. This form mends them, the last three in wording that was not read again, except for two narrow gaps
-in the tests of the 60-second refusal and the word "private" in one of the reminder's error messages. No general claim
-about agent quality or security is made.
+Reviewed across its versions by OpenAI's GPT-6 Astra and GPT-6.1 Sol, whose lab also wrote the reminder's first version,
+and by Google's Gemini 4 Argon. Still open: what "What it does not do" lists, two narrow test gaps and one error
+message's wording; the last three wording mends were not read again. No general claim about agent quality or security is
+made.
 
 ## Licence
 
