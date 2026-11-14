@@ -63,30 +63,34 @@ not tested. The test does not show that the plugin keeps more of a session than 
 
 ## Requirements
 
-- Claude Code with plugin hooks modules. The plugin's tests and Claude Code's validation passed on Claude Code
-  2.1.323; other versions have not been tested here, and no live session has run this package.
+- Claude Code with plugin hooks modules. The plugin's tests and Claude Code's validation passed on Claude Code 2.1.323,
+  and its install and tests on 2.1.325; other versions have not been tested here, and no live session has run this
+  package.
 - Linux. The checker reads where an open file is from `/proc/self/fd`, and the reminder locks its state with `fcntl`.
 - Python 3, standard library only, for the checker and the reminder. Their tests were run with Python 3.14 and 3.15;
   older versions have not been tested.
 
 ## Install
 
-The repository is a plugin marketplace holding the one plugin, `checkpoint-compact`. From a clone:
+The repository is a plugin marketplace holding the one plugin, `checkpoint-compact`. From a clone, or the folder a
+release ZIP unzips to:
 
 ```sh
 claude plugin marketplace add /path/to/checkpoint-compact-example
 claude plugin install checkpoint-compact@checkpoint-compact-example
 ```
 
-These are Claude Code's own plugin commands; this package's install has not been tested here. Create the records folder
-before the first checkpoint, private to you, since the checker refuses while it does not exist:
+These are Claude Code's own plugin commands; this package's install was tried once here, from its release ZIP in a fresh
+profile, by a Claude session that did not build it. Claude Code reads the plugin from that folder afterwards, so keep
+it. Create the records folder before the first checkpoint, private to you, since the checker refuses while it does not
+exist:
 
 ```sh
 mkdir -p ~/.local/state/checkpoint-compact && chmod 700 ~/.local/state/checkpoint-compact
 ```
 
 Then tell your sessions how to checkpoint, for example in your `CLAUDE.md`: when to call the tool, where to write the
-resume file and what it must hold.
+resume file and what it must hold. The file's rules are under "Resume files" below.
 
 ## How it works
 
@@ -207,6 +211,8 @@ Version numbers are the Claude Code versions each was seen on.
   not established. Seen once in 22 compactions of one session, and in 2 of 3 runs on the stand-in, those on 2.1.318.
 
 ## Tests
+
+From the repository's top folder:
 
 ```sh
 cd plugins/checkpoint-compact
